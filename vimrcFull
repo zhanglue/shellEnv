@@ -1,0 +1,773 @@
+set cst
+set csto=1 
+set nocsverb
+set csverb
+
+
+"0, 启动gvim最大化
+if has('win32')
+    au GUIEnter * simalt ~x
+else
+    au GUIEnter * call MaximizeWindow()
+endif
+
+function! MaximizeWindow()
+    silent !wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz
+endfunction
+
+"1, 基本设置:
+"-----------------------------------------------------
+
+"去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+"也可以用set nocp代替
+"与其相反的设置是set cp,但最好用set nocp
+set nocompatible
+
+"显示模式
+set smd        "set showmode
+set sc         "set showcmd
+
+"设置80列参考线
+"set mc=80
+
+"设置自动保存
+set aw         "set autowrite
+set awa        "set autowriteall
+
+"设置打开标题
+set title 
+
+
+"使打开文件时使光标自动定位到上一次文件被关闭时的准确行
+if has("autocmd")
+  " In text files, always limit the width of text to 78 characters
+  autocmd BufRead *.txt set tw=78
+  ""When editing a file, always jump to the last cursor position,只能精确到行
+  ""不能精确到列
+  "autocmd BufReadPost *
+  "\ if line("'\"") > 0 && line ("'\"") <= line("$") |
+  "\   exe "normal! g'\"" |
+  "\ endif
+  "下面这一句不但能精确到行，还能精确到列
+  au BufReadPost * exe "normal! g`\""
+endif
+
+"设置高亮关键字显示
+syntax enable
+syntax on     "等同于syn on
+
+"禁止在搜索到文件两端时重新搜索
+"set nows          "set nowrapscan              
+set ws
+
+"设置搜索式的匹配字符串高亮显示
+set hls    "set hlsearch
+"设置搜索式的匹配字符串不高亮显示
+"set nohls  "set nohlsearch 
+
+"高亮光标所在的当前行set cursorline
+"set cul         "相反的设置是set nocul
+set nocul
+
+
+"搜索时在未完全输入完毕要检索的文本时就开始检索
+set is       "set incsearch
+"搜索时在未完全输入完毕要检索的文本时不开始检索
+"set nois       "set noincsearch
+
+"设置以backspace删除自动缩进的，行末回车，行首的字符，很有用
+set backspace=indent,eol,start
+
+"设置忽略大小写set ignorecase,set smartcase
+"注意可以在搜索模式中用\c(always ignorecase),\C(always no ignorecase)
+"来否决这里的设置
+"此外，注意，smartcase对于标签（*,#）的查找无效（可先标签查一下，然后回到命令行
+"搜索模式在搜索历史记录里找到上一次的搜索记录搜索之。）
+"而ignorecase 对标签查找和命令行搜索模式查找都有效
+set ic   "相反是 set noic
+set scs  "相反是 set noscs
+
+"增强模式中的命令行自动完成操作,非常有用
+set wildmenu
+
+"设置代码折叠为按语法折叠
+"set foldmethod=syntax
+"设定折叠方式为手动
+"set foldmethod=manual
+"设置启动vim时不要自动折叠代码
+"set foldlevel=100
+"set fdc=1      "set foldcolumn=1 
+
+"设置帮助的语言为中文
+set helplang=cn
+"设置帮助的语言为英文
+"set helplang=en
+
+"实现C程序的缩进(indent)
+set cin   
+
+"设置行号,也可以写成set number
+set nu
+"不设置行号
+"set nonu
+
+
+"背景使用（或亮色light）,简写成bg
+"注意有了colorScheme的设置后，这一行的设置往往是多余了。
+"因为每一个特定的colorscheme都会对background进行设置
+set bg=dark
+"set bg=light
+
+"设置配色方案
+"colorscheme 简写成colo,在命令行只输入colo，会输出显示当前激活的配色方案名
+colo solarized
+"colo desert
+"colo evening 
+"colo night
+"colo navajo
+"colo lucius
+"colo blackdust
+"colo freya
+"colo darkslategray
+"colo torte
+"colo fruidle
+
+"设置编辑模式下状态栏标尺显示
+set ru "set ruler
+"设置编辑模式下状态栏标尺不显示
+"set noru "set noruler
+
+"记录历史的行数
+set history=1000
+
+""检测文件类型
+"filetype on
+"" 开启文件类型检测 的插件和缩进开
+"filetype plugin indent on   
+
+"设置可以至上一行和下一行的字符按键
+set ww=b,s,<,>,[,]  ",h,l
+
+
+"Alt组合键不映射到菜单上
+set winaltkeys=no
+
+"同时支持GBK和UTF-8编码
+set fileencodings=utf-8,ucs-bom,gbk,cp936
+set fileencoding=utf-8
+set encoding=utf-8
+"如果在终端环境下使用Vim，需要设置termencoding和终端所使用的编码一致。例如：
+set termencoding=utf-8 
+
+"如果你不要加载csExplorer.vim插件，可如下设置
+"let loaded_csExplorer = 1 
+"映射<F12>为ColorSchemeExplorer的快捷键
+"nmap <F12>   :ColorSchemeExplorer<CR>    "normal模式下，删除所有行尾多余的空格.
+"imap <F12>   <ESC><F12>                  "insert模式同上
+"vmap <F12>   <ESC><F12>                  "visual模式同上
+"-----------------------------------------------------
+"关于状态行配置
+
+"总是显示状态行
+set laststatus=2            "set ls=2    
+
+"有关statusline 1:
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""格式化状态行，史上最好看的状态行,Nice statusbar
+"set laststatus=2
+"set statusline=
+"set statusline+=%2*%-3.3n%0*\ " buffer number
+"set statusline+=%f\ " file name
+"set statusline+=%h%1*%m%r%w%0* " flag
+"set statusline+=[
+"if v:version >= 600
+"set statusline+=%{strlen(&ft)?&ft:'none'}, " filetype
+"set statusline+=%{&encoding}, " encoding
+"endif
+"set statusline+=%{&fileformat}] " file format
+"if filereadable(expand("$VIM/vimfiles/plugin/vimbuddy.vim"))
+"set statusline+=\ %{VimBuddy()} " vim buddy
+"endif
+"set statusline+=%= " right align
+""set statusline+=%2*0x%-8B\ " current char
+"set statusline+=0x%-8B\ " current char
+"set statusline+=%-14.(%l,%c%V%)\ %<%P " offset
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"有关statusline2
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"set laststatus=2
+"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L] 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"有关statusline3
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"-----  状态栏设置_BEGIN_ -----
+"显示状态栏
+set laststatus=2
+"显示当前文件名，文件格式，文件类型
+set statusline=%2*%n%m%r%h%w%*\ %F\ %1*\ [COL=%2*%03v%1*]\ [ROW=%2*%03l%1*/%3*%L(%p%%)%1*]\ 
+"设置状态栏根据不同状态显示不同颜色
+function! InsertStatuslineColor(mode)
+    if a:mode == 'i'
+        hi statusline guibg=peru
+    elseif a:mode == 'r'
+        hi statusline guibg=blue
+    else
+        hi statusline guibg=red
+    endif
+endfunction
+au InsertEnter * call InsertStatuslineColor(v:insertmode)
+au InsertLeave * hi statusline guibg=lightGreen guifg=black
+hi statusline guibg=lightGreen
+"状态行颜色
+highlight StatusLine guifg=black guibg=Green
+highlight StatusLineNC guifg=Gray guibg=White
+
+hi User1 guifg=gray
+hi User2 guifg=yellow
+hi User3 guifg=white
+"----- 状态栏设置_END_ -----
+
+"设置更新ctags文件的快捷键
+"map <F3>   : !  ${HOME}/tools/gen_ctags_by_dingbin.bash "%:p:h" z6ctags  <CR>
+"map <F4>   : !  ${HOME}/tools/gen_ctags_by_dingbin.bash "%:p:h" oactags  <CR>
+"map <F5>   : !  ${HOME}/tools/gen_ctags_by_dingbin.bash "%:p:h" qtctags  <CR>
+
+"设置grep插件的快捷键
+"nnoremap <silent> <F4> :Grep<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"-----------------------------------------------------
+
+"2, 文本编辑设置
+"-----------------------------------------------------
+"自动缩进的时候， 缩进尺寸为 4 个空格。
+"即shiftWidth，自动缩进的空格数，用于<<,>>,cindent
+set shiftwidth=4         
+
+"softtabstop,sts,默认是0,
+"执行编辑操作，如插入 <Tab> 或者使用 <BS> 时，把 <Tab> 算作空格的数目
+set softtabstop=4     "set sts=4
+
+"编辑时将所有 Tab 替换为空格。
+"该选项只在编辑时将 Tab 替换为空格， 如果打开一个已经存在的文件， 并不会将已有的
+"Tab 替换为空格。 
+"设置了该选项后，如果想输入tab制表符，先输入CTRL-V或CTRL-Q，再输入tab制表符
+set et    "相反的设置是set noet
+"Tab 宽度为 4 个字符。
+set ts=4      "即set tabstop=4
+
+"设置ZZ 效果等同于zz
+nnoremap ZZ zz
+"Tab操作快捷方式!
+nnoremap <C-TAB>  :tabnext<CR>
+nnoremap <C-S-TAB>  :tabprev<CR>
+"关于tab的快捷键
+"map tn :tabnext<cr>
+"map tp :tabprevious<cr>
+"map td :tabnew .<cr>
+"map te :tabedit<SPACE>
+"map tc :tabclose<cr>
+
+"覆盖文件时不备份
+set nobackup                                                        
+"成功保存文件之前备份             
+set wb          "set writebackup
+"set nowb         "set nowritebackup
+                 
+" autochdir(acd),noautochdir(noacd)
+"如果打开，Vim 会在你打开文件、切换缓冲区、删除缓冲区或者打开/关闭窗口
+"时改变当前工作目录的值。具体来说，就是打开或者选择的文件所在的目录。
+"提供该选项的目的是和 Sun ONE Studio 4 Enterprise Edition 发行的 Vim 后
+"向兼容。
+"注意: 打开次选项会使得某些插件无法工作。
+set acd
+
+"插入括号时,短暂地跳转到匹配的对应括号
+set sm            "set showmatch               
+"短暂跳转到匹配括号的时间
+set matchtime=2
+
+"设置魔术
+set magic                   
+
+"允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
+set hidden                  
+
+"开启新行时使用智能自动缩进
+set smartindent             
+set autoindent
+"关于另外一个些缩进--------------------------------------------------------
+"设定 C/C++ 风格自动缩进的选项， 这里简要介绍一下这段代码里用到的选项的含义,cino 支持的选项还很多， 更多选项请看用户手册。
+set cino=:0g0t0(sus
+"// :0
+"// switch 语句之下的 case 语句缩进 0 个空格，也就是说不缩进，与 switch 块平
+"// 齐，使用这样风格：
+"switch (x)
+"{
+"case 1:
+"a = b;
+"break;
+"default:
+"}
+"// g0
+"//
+"// class、struct 等之下的访问权限控制语句，如 public、protected、private 等，
+"// 相对 class、struct 等所在的块缩进 0 个空格，与 class 等块平齐，使用这样的
+"// 风格：
+"class foo
+"{
+"public:
+"int a;
+"private:
+"int b;
+"};
+"// t0
+"//
+"// 如果函数返回值与函数名不在同一行，则返回值缩进 0 个空格，也就是说不缩进，如
+"// 下所示：
+"// set cino=t4
+"int
+"func1()
+"{
+"}
+"// set cino=t0
+"int
+"func()
+"    {
+"    }
+"    // (sus
+"    //
+"    // 当一对括号跨越多行时，其后的行缩进前面 sw 指定的距离，效果如下：
+"    int a = (1 + 2 + 3
+"    + 4 + 5 + 6
+"    + 7 + 8) * 9;
+"--------------------------------------------------------
+
+"打开普通文件类型的自动缩进。 该自动缩进不如 cindent 智能， 但它可以为你编辑非 C/C++ 文件提供一定帮助。
+set ai
+
+"选中状态下 Ctrl+c 复制
+"vmap <C-c> "+y
+"映射微软的visual studio的编辑操作常用快捷键
+"vmap <S-up>     <up>
+"vmap <S-down>   <down>
+"vmap <C-S-up>     <up>
+"vmap <C-S-down>   <down>
+"
+"imap <S-left>   <ESC>v
+"imap <S-right>  <right><ESC>v
+"imap <S-up>    <ESC>v<up>
+"imap <S-down>   <right><ESC>v<down>
+"
+"imap <C-S-left>   <ESC>v<C-S-left>
+"imap <C-S-right>  <right><ESC>v<C-S-right>
+"imap <C-S-up>     <ESC>v<C-S-up>
+"imap <C-S-down>   <right><ESC>v<C-S-down>
+"
+"nmap <S-left>   <ESC>v
+"nmap <S-right>  <ESC>v 
+""nmap <S-up>    <ESC>v<up> 
+"nmap <S-down>   <ESC>v<down>
+"nmap <C-S-left>   <ESC>v<C-S-left>
+"nmap <C-S-right>  <ESC>v<C-S-right> 
+"nmap <C-S-up>     <ESC>v<C-S-up> 
+"nmap <C-S-down>   <ESC>v<C-S-down> "以上所有功能居然可以通过设置一个 keymodel来获得
+"使用 Shift + 方向键等来选择文本,简写作km
+"注意使用的过程中可以通过e和b键盘以word为单位前进或后退以选择文本
+"set keymodel=                    "不使用此功能
+set keymodel=startsel,stopsel     "使用此功能
+
+"visual 模式下标签查找(*,#)可用
+vnoremap  *  <ESC>/<C-r>*<CR>  
+vnoremap  #  <ESC>?<C-r>*<CR>  
+nnoremap  g[  :tag <C-R>=expand("<cWORD>")<CR><CR>
+vnoremap  g[  <ESC>:tag <C-r>*<CR>
+
+"快速补全
+"inoremap ( ()<left>
+"inoremap [ []<left>
+"inoremap { {}<left>
+"inoremap { {<CR>}<up><CR><SPACE><SPACE><SPACE><SPACE><ESC><C-e><C-e><C-e>a
+"inoremap < <><left>
+"inoremap ' ''<left>
+"--------------------------------------------------------------------------------
+"以前贴过一个vim的配置文件，其中有段关于括号自动补全的。当时用着不太爽，就一直那么放着没用。前两天要抄比较多的代码，就想到括号自动补全来减少工作量，于是乎费了半天工夫，于是花费数个小时，google之，终于修改的自我感觉良好了。由于不太会写vim的script，所以很多实现比较dirty，凑合着用吧。
+"
+"针对我认为原有脚本补全的不足，我主要做了一下几个方面的补充：
+"1）定义了<S-ENTER>快捷键，用于跳出括号，省去了再按ESC，然后移动。但有一个不足，就是，对于多重大括号，是跳到最后一个的下一行。没想到什么更好的办法，希望能有人给改改；
+"2）定义了<S-SPACE>快捷键，用于跳过括号，相当与normal状态下的l；
+"3）定义了“;;”快捷键，主要是方便的在多重括号中直接移动到行尾，并添加“；”；
+"4）对大括号的（“{}”）的补全做了判断，分几种情况处理，以保证格式。
+"
+"另外，用了半天，感觉还可以，但是还是不够完美。其实最完美的解决方案就是不用补全。越搞就越复杂了，简单才好。
+
+":inoremap <S-ENTER> <c-r>=SkipPair()<CR>
+"不需要这个快捷键，因该键已与Ctrl+l表示的在插入模式下光标右移一位重复了
+":inoremap <S-SPACE> <ESC>la
+"因该键与 linux下中文输入法开关键冲突，故关闭之。
+":inoremap <C-ENTER> <ESC>A;<CR>
+":inoremap ( ()<ESC>i
+":inoremap ) <c-r>=ClosePair(')')<CR>
+":inoremap { <c-r>=ClsoeBrace()<CR>
+":inoremap } <c-r>=ClosePair('}')<CR>
+":inoremap [ []<ESC>i
+":inoremap ] <c-r>=ClosePair(']')<CR>
+":inoremap ;; <ESC>A;<CR>
+
+function ClosePair(char)
+   if getline('.')[col('.') - 1] == a:char
+      return "\<Right>"
+   else
+      return a:char
+   endif
+endf
+function Semicolon()
+   "echo getline('.')[col('.')]
+   if getline('.')[col('.')] == ')'
+      return "<ESC>A;"
+   elseif getline('.')[col('.')] == '}'
+      return "\<ESC>A;"
+   elseif getline('.')[col('.')] == ']'
+      return "\<ESC>A;"
+   else
+      return ";"
+   endif
+endf
+function SkipPair()
+   if getline('.')[col('.') - 1] == ')'
+      return "\<ESC>o"
+   else
+      normal j
+      let curline = line('.')
+      let nxtline = curline
+      while curline == nxtline
+         if getline('.')[col('.') - 1] == '}'
+            normal j
+            let nxtline = nxtline + 1
+            let curline = line('.')
+            continue
+         else
+            return "\<ESC>i"
+         endif
+        
+      endwhile
+      return "\<ESC>o"
+   endif
+endf
+function ClsoeBrace()
+   if getline('.')[col('.') - 2] == '='
+      return "{}\<ESC>i"
+   elseif getline('.')[col('.') - 3] == '='
+      return "{}\<ESC>i"
+   elseif getline('.')[col('.') - 1] == '{'
+      return "{}\<ESC>i"
+   elseif getline('.')[col('.') - 2] == '{'
+      return "{}\<ESC>i"
+   elseif getline('.')[col('.') - 2] == ','
+      return "{}\<ESC>i"
+   elseif getline('.')[col('.') - 3] == ','
+      return "{}\<ESC>i"
+   else
+      return "{\<ENTER>}\<ESC>O"
+   endif
+endf
+
+"--------------------------------------------------------------------------------
+
+
+
+"插入模式下使Ctrl+ h,j,k,l四个键效果等同于移动上、下、左、右方向键
+inoremap <C-h> <Left>
+inoremap <C-j> <Down>
+inoremap <C-k> <Up>
+inoremap <C-l> <Right>
+"插入模式下使ctrl+ w,b两个键效果等同于普通模式下ctrl+w(前进一个单词)，ctrl+b(
+"后退一个单词)
+inoremap <C-b> <C-o>b
+inoremap <C-w> <C-o>w
+"插入模式下使ctrl+ f(front),Ctrl+e(end)两个键效果等同于普通模式下<home>,<end>键
+inoremap <C-e>  <C-o><End>
+inoremap <C-f>  <C-o><Home>
+"插入模式下ctrl + d,等效于普通模式下backspace键，
+"插入模式下ctrl + x,等效于普通模式下delete键，
+inoremap <C-d> <BS>
+inoremap <C-x> <Del>
+
+
+"指定在选择文本时,光标所在位置也属于被选中的范围
+set selection=inclusive
+"-----------------------------------------------------
+
+
+"3, 图形界面设置:
+"-----------------------------------------------------
+"指定不折行。 如果一行太长， 超过屏幕宽度， 则向右边延伸到屏幕外面。如果使用图形界面的话， 指定不折行视觉效果会好得多。
+"set nowrap
+set wrap
+
+"设置显示时一行的文本宽宽
+"set tw=80       "set textwidth=80
+
+"添加水平滚动条。 如果你指定了不折行， 那为窗口添加一个水平滚动条就非常有必要了。
+set guioptions-=b
+"去除vim的GUI版本的toolbar
+set guioptions+=T
+"去除vim的GUI版本的menubar
+set guioptions+=m
+
+"设置断行，当一行的文字太长时，为自动智能在一个单词的中间
+"空白处断开到下一行显示，注意：这里的断行只用显示，并不在行末加<EOF>
+set lbr           "set linebreak
+"打开断行模块对亚洲语言支持。 m 表示允许在两个汉字之间断行， 即使汉字之间没有出现空格。
+"B 表示将两行合并为一行的时候， 汉字与汉字之间不要补空格。 该命令支持的更多的选项请参看用户手册。
+set fo+=mB
+
+"配置字体
+set guifont=Ubuntu\ Mono\ 15
+"set guifont=Bitstream\ Vera\ Sans\ Mono\ 10
+"set guifont=DejaVu\ Sans\ Mono\ 13
+"set fileencoding=gbk
+"set guifont=Courier\ 11 
+"set guifont=Inconsolata\ Medium\ 9  "史上最好看的vim字体
+"set gfw=幼圆:h10.5:cGB2312
+"set guifont=Bitstream\ Vera\ Sans\ Mono\ 10 
+
+"当右键单击窗口的时候， 弹出快捷菜单
+set mousemodel=popup
+"不使用选择模式
+set selectmode=
+
+"设置屏幕滚动的ctrl+d,ctrl+u的行数，默认是窗口的一半，即半屏
+set scr=4
+
+"-----------------------------------------------------
+
+"4)条件配置
+"-----------------------------------------------------
+"同一个配色方案， 在 gvim 下和字符界面的 vim 下效果大相径庭， 滇狐个人的习惯是，
+"在 gvim 下使用 torte 配色方案， 在 vim 下使用 ron 配色方案。 因此我们有必要针对
+"gvim 和 vim 进行不同的设置。
+"另外， 前面我们在 gvim 下不使用折行， 开启水平滚动条， 但在 vim 下，
+"是没有滚动条可用的， 因此还是有必要为 vim 保留自动折行。
+"条件选择设置的格式如下：
+if (!has("gui_running"))
+    set notitle
+endif
+"-----------------------------------------------------
+
+
+":match underlined  /\%>80v.*/
+"设置超过80列的字符带下划线
+"au BufWinEnter * let w:m2=matchadd('Underlined', '\%>50v.\+', -1)
+"syn match out80 /\%20v./ containedin=ALL
+"hi out80 guifg=red guibg=green 
+
+"高亮字符，让其不受100列限制
+":highlight OverLength ctermbg=red ctermfg=white guibg=grey guifg=white
+":match OverLength '\%101v.*' 
+
+"5)有关一些插件的配置
+
+""""""""""""""""""""""""""""""
+" vimgdb setting
+""""""""""""""""""""""""""""""
+let g:vimgdb_debug_file = ""
+nnoremap gdb :run macros/gdb_mappings.vim<cr>
+
+""""""""""""""""""""""""""""""
+"Taglist plugin settings 
+""""""""""""""""""""""""""""""
+"启动vim自动打开taglist
+"let Tlist_Auto_Open = 1 
+
+" 不同时显示多个文件的 tag ，只显示当前文件的
+let Tlist_Show_One_File = 1
+
+" 如果 taglist 窗口是最后一个窗口，则退出 vim
+let Tlist_Exit_OnlyWindow = 1
+
+"让当前不被编辑的文件的方法列表自动折叠起来 
+let Tlist_File_Fold_Auto_Close = 1
+
+"把taglist窗口放在屏幕的右侧，缺省在左侧 
+let Tlist_Use_Right_Window=1 
+
+"显示taglist菜单
+let Tlist_Show_Menu = 1
+
+"taglist window width
+let Tlist_WinWidth = 40
+
+
+""""""""""""""""""""""""""""""
+"Winmanager plugin settings 
+""""""""""""""""""""""""""""""
+"设置界面分割
+"let g:winManagerWindowLayout='FileExplorer|TagList'
+"let g:winManagerWindowLayout = BufExplorer,FileExplorer|TagList"
+"let g:winManagerWindowLayout = TagList|FileExplorer,BufExplorer"
+
+"设置winmanager的宽度，默认为25
+"let g:winManagerWidth = 30
+
+"定义打开关闭winmanager按键
+"nmap wm :WMToggle<cr>
+nmap <silent> <F8> :WMToggle<cr>
+"nmap <silent> <F8> :TlistToggle<cr>
+
+"1)将插件显示在右侧
+"打开winmanager.vim，在function! <SID>StartWindowsManager()函数中修改：
+"将：wincmd H 修改为wincmd L：
+" for now assume that the explorer windows always stay on the left.
+" TODO: make this optional later
+" make the explorers window always stay on the right ---by chenyong
+"        wincmd H
+"wincmd L
+
+"2)进入vim自动打开winmanager
+"在进入vim时自动打开winmanager
+"let g:AutoOpenWinManager = 1
+"相应的在winmanager.vim中修改：
+"set auto open Winmanager 
+"if g:AutoOpenWinManager 
+"autocmd VimEnter * nested call s:StartWindowsManager()|1wincmd w  
+"endif
+
+"3)退出缓冲区时，自动退出vim
+"这个功能是参考了taglist的自动退出功能，在taglist.vim中修改的。
+"函数：function! s:Tlist_Window_Exit_Only_Window()中的winbunr(2)改为winbunr(3)，
+"即只剩2个窗口时关闭，考虑到2个窗口肯定是同时存在，所以这样还是可行的： 
+"同时在vimrc中需要设置：
+"let Tlist_Exit_OnlyWindow=1
+
+
+""""""""""""""""""""""""""""""
+"QuickFix plugin settings 
+""""""""""""""""""""""""""""""
+"nmap <F6> :cn<cr>
+"nmap <F7> :cp<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"设定是否使用 quickfix 窗口来显示 cscope 结果
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+":set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+"cscope find"的用法:
+"cs find c|d|e|f|g|i|s|t name
+"0 或 s 	查找本 C 符号(可以跳过注释)
+"1 或 g 	查找本定义
+"2 或 d 	查找本函数调用的函数
+"3 或 c 	查找调用本函数的函数
+"4 或 t 	查找本字符串
+"6 或 e 	查找本 egrep 模式
+"7 或 f 	查找本文件
+"8 或 i 	查找包含本文件的文件
+nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-_>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-_>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-_>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-_>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"minBufExplorer settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"<Tab> 	向前循环切换到每个buffer名上
+"<S-Tab> 	向后循环切换到每个buffer名上
+"<Enter> 	在打开光标所在的buffer
+"d 	删除光标所在的buffer
+"
+let g:miniBufExplMapWindowNavVim = 1 
+let g:miniBufExplMapWindowNavArrows = 1 
+"let g:miniBufExplMapCTabSwitchBufs = 1 
+let g:miniBufExplModSelTarget = 1
+
+"避免miniBufExplorer错乱的终极关键
+let g:miniBufExplorerMoreThanOne= 0  
+let g:miniBufExplMapCTabSwitchBufs = 1
+"<C-Tab> 	向前循环切换到每个buffer上,并在但前窗口打开
+"<C-S-Tab> 	向后循环切换到每个buffer上,并在但前窗口打开
+
+"let g:miniBufExplMapWindowNavVim = 1
+"则可以用<C-h,j,k,l>切换到上下左右的窗口中去,就像:
+"C-w,h j k l    向"左,下,上,右"切换窗口.
+
+"let g:miniBufExplMapWindowNavArrows = 1
+"是用<C-箭头键>切换到上下左右窗口中去
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"new-omni-completion settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"用于new-omni-completion
+set completeopt=longest,menu
+"Ctrl+X Ctrl+O
+"Ctrl+P 	向前切换成员
+"Ctrl+N 	向后切换成员
+"Ctrl+E 	表示退出下拉窗口, 并退回到原来录入的文字
+"Ctrl+Y 	表示退出下拉窗口, 并接受当前选项
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+"头文件与源文件相互切换a.vim settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <silent> <F12> :A<CR> 
+"A 	    在新Buffer中切换到c\h文件
+"AS 	横向分割窗口并打开c\h文件
+"AV 	纵向分割窗口并打开c\h文件
+"AT 	新建一个标签页并打开c\h文件
+
+set scrolloff=8
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""  Vundle
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"设置包括vundle和初始化相关的runtime path
+"set rtp+=~/.vim/bundle/Vundle.vim
+"call vundle#begin()
+"" 另一种选择, 指定一个vundle安装插件的路径
+""call vundle#begin('~/some/path/here')
+"
+"" 让vundle管理插件版本,必须
+"Plugin 'VundleVim/Vundle.vim'
+"
+"" 以下范例用来支持不同格式的插件安装.
+"" 请将安装插件的命令放在vundle#begin和vundle#end之间.
+"" Github上的插件
+"" 格式为 Plugin '用户名/插件仓库名'
+"Plugin 'tpope/vim-fugitive'
+"" 来自 http://vim-scripts.org/vim/scripts.html 的插件
+"" Plugin '插件名称' 实际上是 Plugin 'vim-scripts/插件仓库名' 只是此处的用户名可以省略
+"Plugin 'L9'
+"" 由Git支持但不再github上的插件仓库 Plugin 'git clone 后面的地址'
+"Plugin 'git://git.wincent.com/command-t.git'
+"" 本地的Git仓库(例如自己的插件) Plugin 'file:///+本地插件仓库绝对路径'
+"" Plugin 'file:///home/gmarik/path/to/plugin'
+"" 插件在仓库的子目录中.
+"" 正确指定路径用以设置runtimepath. 以下范例插件在sparkup/vim目录下
+"Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+"" 安装L9，如果已经安装过这个插件，可利用以下格式避免命名冲突
+"Plugin 'ascenator/L9', {'name': 'newL9'}
+"
+"" 你的所有插件需要在下面这行之前
+"" call vundle#end()            " 必须
+"" filetype plugin indent on    " 必须 加载vim自带和插件相应的语法和文件类型相
+"" 关脚本
+"" " 忽视插件改变缩进,可以使用以下替代:
+"" "filetype plugin on
+"" "
+"" " 简要帮助文档
+"" " :PluginList       - 列出所有已配置的插件
+"" " :PluginInstall    - 安装插件,追加 `!` 用以更新或使用 :PluginUpdate
+"" " :PluginSearch foo - 搜索 foo ; 追加 `!` 清除本地缓存
+"" " :PluginClean      - 清除未使用插件,需要确认; 追加 `!` 自动批准移除未使用插件
+"" "
+"" " 查阅 :h vundle 获取更多细节和wiki以及FAQ
+"" " 将你自己对非插件片段放在这行之后
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""  Vundle END
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+

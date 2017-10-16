@@ -1,0 +1,13 @@
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+*.o
+output
+
+.gitignore
+*.swp
+*.swo
+tags
