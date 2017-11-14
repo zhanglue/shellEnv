@@ -7,6 +7,6 @@ I'm very glad to see your messages.
 
 ## Installation
 1. Clone repo down.
-2. Exec """export HH='YOUR_HOME_PATH'; export DIR_RC='YOUR_RC_FILE_PATH'""".
-3. Exec """./release.sh""".
+2. Exec ```export HH='YOUR_HOME_PATH'; export DIR_RC='YOUR_RC_FILE_PATH'```.
+3. Exec ```./release.sh```.
 4. Enjoy it.
