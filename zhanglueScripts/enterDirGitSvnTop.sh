@@ -2,7 +2,7 @@
 
 ################################################################################
 ## Feature  : Return to top of current git repository.
-## Author   : ZhangLue
+## Author   : zhanglue
 ## Date     : 2017.04.28
 ################################################################################
 
@@ -89,9 +89,12 @@ _get_dest_path()
 
 destDepth=$1
 func=""
-repoName=`\git remote -v 2> /dev/null | grep '(push)$' | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f 2`
+# repoName=`\git remote -v 2> /dev/null | grep '(push)$' | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f 2`
+repoName=`\git remote -v 2> /dev/null | grep '(push)$' | cut -c '8-' | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f 1`
 if [[ -n $repoName ]]; then
     repoName=`basename $repoName`
+    # repoName=${repoName:0:$((${#repoName} - 4))}
+    # repoName=${repoName:0:-4}
 else
 	svnURL=`svn info 2> /dev/null | grep '^URL'`
     if [[ -n $svnURL ]]; then

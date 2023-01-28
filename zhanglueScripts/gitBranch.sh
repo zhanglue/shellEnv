@@ -1,16 +1,16 @@
 #!/bin/bash
 
 ################################################################################
-## Feature  : list the items including keyword and enter.
-## Author   : zhanglue 
-## Date     : 2016.09.12
+## Feature  : List git branch in local and checkout.
+## Author   : Zhang ChunYang
+## Date     : 2021.02.02
 ################################################################################
 
 ################################################################################
 ##  CHECK THE COMPLETENESS FIRST OF ALL
 ################################################################################
 if [[ -n ${DIR_SCRIPTS} ]] ||
-   [[ -s "${DIR_SCRIPTS}/common.sh" ]] 
+   [[ -s "${DIR_SCRIPTS}/common.sh" ]]
 then
     COMMON_FILE="${DIR_SCRIPTS}/common.sh"
     . $COMMON_FILE
@@ -33,7 +33,7 @@ _usage()
         echo -e "${GRN_F}listAndEnter.sh${END_S} is used to list all directories and enter, as its name says."
         echo 'It can be executed in and only in "source".'
         echo 'Set a appropriate alias to make it easier.'
-        echo 
+        echo
         _echo_usage
         echo 'source listAndEnter.sh [-h] [-i index] [keywords]'
         echo
@@ -86,9 +86,8 @@ _usage()
 itemIndex=""
 keyword=""
 helpFlag=0
-fileModeFlag=0
 straightFlag=1
-vimFlag=0
+deleteFlag=0
 while (( $# ))
 do
     case $1 in
@@ -103,9 +102,8 @@ do
         -ns | --no-straight )
             straightFlag=0
             ;;
-        -v | --vim )
-            vimFlag=1
-            fileModeFlag=1
+        -d | --delete )
+            deleteFlag=1
             ;;
         *)
             if [[ -z $keyword ]]; then
@@ -123,12 +121,7 @@ if (( $helpFlag )); then
     exit 0
 fi
 
-: ${keyword:="."}
-if (( $fileModeFlag )); then
-    items=(`\ls -tF | grep -v '/$' | sed 's/\///g' | grep -iE "$keyword" 2>/dev/null | grep -v '\.\(pyc\|a\|o\|so\)$' | sort -r`)
-else
-    items=(`\ls -tF | grep '/$' | sed 's/\///g' | grep -iE "$keyword" 2>/dev/null | sort -r`)
-fi
+items=( $( git branch --no-color | grep -E "$keyword" 2> /dev/null | sed 's/[\*]//g' | sed 's/\t/ /g' | sed 's/[[:space:]]\+/ /g' | sort -r ) )
 
 if (( ${#items[@]} == 0 )); then
     echo ""
@@ -136,6 +129,14 @@ if (( ${#items[@]} == 0 )); then
     echo "${RETRACT}Nothing to do with..."
     echo ""
     exit 0
+fi
+
+if (( $deleteFlag )); then
+    echo ""
+    echo -e "${RETRACT}${WHT_F}${RED_B}!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!${END_S}"
+    echo -e "${RETRACT}${RVT_S}${WHT_F}${RED_B}!!YOU ARE GOING TO DELETE BRANCH!!${END_S}"
+    echo -e "${RETRACT}${WHT_F}${RED_B}!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!${END_S}"
+    echo ""
 fi
 
 if (( ${#items[@]} == 1 )) && (( $straightFlag )); then
@@ -157,21 +158,14 @@ if [[ -z $itemIndex ]]; then
     exit 0
 fi
 
-cmd='cd'
-if (( $vimFlag )); then
-    cmd='vim'
+cmd="git checkout"
+if (( $deleteFlag )); then
+    cmd="git branch -d"
 fi
+
 echo ""
-echo "${RETRACT}$cmd ${items[$itemIndex]}"
+echo "${RETRACT}${cmd} ${items[$itemIndex]}"
 echo ""
 
-result=${items[$itemIndex]}
-if [[ -f $transFile_ED ]]; then
-    echo $result > $transFile_ED
-elif (( $vimFlag )); then
-    vim -u ${DIR_RC}/.vimrc $result
-else
-    builtin cd $result
-    pwd
-    ls --color
-fi
+branchName=${items[$itemIndex]}
+${cmd} $branchName

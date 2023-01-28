@@ -2,7 +2,7 @@
 
 ################################################################################
 ## Feature  : Search text in files.
-## Author   : ZhangLue 
+## Author   : zhanglue 
 ## Date     : 2017.04.14
 ################################################################################
 
@@ -32,31 +32,56 @@ fi
 while (( $# != 0 ))
 do
     curArg="$1"
-    shift 1
+    shift
 
-    if [[ -z "$pattern" ]]; then
-        if [[ "$curArg" == "--" ]]; then
-            grepArgs="$grepArgs $curArg"
-            pattern="$1"
-            shift 1
-        elif [[ "${curArg:0:1}" != "-" ]]; then
-            pattern="$curArg"
+    if [[ -n "$pattern" ]]; then
+        pathArgs="$pathArgs $curArg"
+        continue
+    fi
+
+    if [[ "$curArg" == "--" ]]; then
+        grepArgs="$grepArgs $curArg"
+        pattern="$1"
+        shift 1
+        continue
+    fi
+
+    if [[ "${curArg:0:1}" == "-" ]]; then
+        if [[ "${curArg}" == '-v' ]]; then
+            AntiGrep="$1"
+            shift
         else
             grepArgs="$grepArgs $curArg"
         fi
-    else
-        pathArgs="$pathArgs $curArg"
+        continue
     fi
+
+    pattern="$curArg"
 done
 
-find \
-    $pathArgs \
-    -regex ${WCGREP_IGNORE:-'.*~$\|.*/\.\(git\|hg\|svn\)\(/\|$\)'} \
-    -prune \
-    -o \
-    -type f \
-    -print0 \
-  | xargs \
-    -r0 \
-    ${WCGREP_GREP:-grep} --color \
-    ${WCGREP_GREPARGS:--HnI} $grepArgs "$pattern"
+if [[ -n $AntiGrep ]]; then
+    find \
+        ${pathArgs:-.} \
+        -regex ${WCGREP_IGNORE:-'.*~$\|.*/\.\(git\|hg\|svn\)\(/\|$\)'} \
+        -prune \
+        -o \
+        -type f \
+        -print0 \
+      | xargs \
+        -r0 \
+        ${GREP_BIN:-grep} \
+        ${GREP_PARAMS:--HnI -i --color} $grepArgs "$pattern" \
+      | grep -v "$AntiGrep"
+else
+    find \
+        ${pathArgs:-.} \
+        -regex ${WCGREP_IGNORE:-'.*~$\|.*/\.\(git\|hg\|svn\)\(/\|$\)'} \
+        -prune \
+        -o \
+        -type f \
+        -print0 \
+      | xargs \
+        -r0 \
+        ${GREP_BIN:-grep} \
+        ${GREP_PARAMS:--HnI -i --color} $grepArgs "$pattern"
+fi

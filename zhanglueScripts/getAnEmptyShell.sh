@@ -2,7 +2,7 @@
 
 ################################################################################
 ## Feature  : Get an empty file of specified type.
-## Author   : ZhangLue 
+## Author   : zhanglue 
 ## Date     : 2017.01.23
 ################################################################################
 
@@ -36,7 +36,7 @@ _output_template_bash()
 {
     local author=$USER
     if [[ $author == 'zhanglue' ]]; then
-        author="ZhangLue"
+        author="zhanglue"
     fi
     echo "#!/bin/bash
 
@@ -50,7 +50,8 @@ _output_template_bash()
 
 _output_template_python()
 {
-    echo "#/* encoding=utf-8 */
+    echo "#!/usr/bin/env python
+#/* encoding=utf-8 */
 #/* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */
 
 " > $goalFileName
@@ -102,7 +103,7 @@ case $goalFileType in
         ;;
     python)
         goalFileType="python"
-        needChmod=0
+        needChmod=1
         ;;
     c | C)
         goalFileType="c"

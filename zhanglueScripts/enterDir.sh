@@ -2,7 +2,7 @@
 
 ################################################################################
 ## Feature  : Wrap kinds of enter*.sh
-## Author   : ZhangLue
+## Author   : zhanglue
 ## Date     : 2017.05.03
 ################################################################################
 
@@ -44,10 +44,13 @@ else
         else
             export transFile_ED=`mktemp`
             ${processCMD_ED} "$@"
+            # ~/work/privateEnv/zhanglue/${processCMD_ED} "$@"
             if (( ! $? )); then
                 dirToEnter_ED=`cat $transFile_ED | tail -n 1`
                 if [[ -d $dirToEnter_ED ]]; then
-                    builtin cd $dirToEnter_ED
+                    # builtin cd $dirToEnter_ED
+                    # pwd -P
+                    cd $dirToEnter_ED
                 #else
                 #    _error 1
                 fi

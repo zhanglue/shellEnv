@@ -2,7 +2,7 @@
 
 ################################################################################
 ## Feature  : 2048 in BASH
-## Author   : ZhangLue 
+## Author   : zhanglue 
 ## Date     : 2015.07.15
 ################################################################################
 
@@ -85,9 +85,9 @@ _initialise_base()
         tmpArrBBB=()
         for (( j=0; j<4; ++j ))
         do
-            tmpArrBBB+=( $(( $i + $j * 4 )) )
+            tmpArrBBB=( ${tmpArrBBB[@]} $(( $i + $j * 4 )) )
         done
-        tmpArrAAA+=( "${tmpArrBBB[*]}" )
+        tmpArrAAA=( ${tmpArrAAA[@]} "${tmpArrBBB[*]}" )
     done
     TRAVERSE_ARRAY_UP=( "${tmpArrAAA[@]}" )
 
@@ -97,9 +97,9 @@ _initialise_base()
         tmpArrBBB=()
         for (( j=3; j>=0; --j ))
         do
-            tmpArrBBB+=( $(( $i + $j * 4 )) )
+            tmpArrBBB=( ${tmpArrBBB[@]} $(( $i + $j * 4 )) )
         done
-        tmpArrAAA+=( "${tmpArrBBB[*]}" )
+        tmpArrAAA=( ${tmpArrAAA[@]} "${tmpArrBBB[*]}" )
     done
     TRAVERSE_ARRAY_DOWN=( "${tmpArrAAA[@]}" )
 
@@ -109,9 +109,9 @@ _initialise_base()
         tmpArrBBB=()
         for (( j=0; j<4; ++j ))
         do
-            tmpArrBBB+=( $(( $i * 4 + $j )) )
+            tmpArrBBB=( ${tmpArrBBB[@]} $(( $i * 4 + $j )) )
         done
-        tmpArrAAA+=( "${tmpArrBBB[*]}" )
+        tmpArrAAA=( ${tmpArrAAA[@]} "${tmpArrBBB[*]}" )
     done
     TRAVERSE_ARRAY_LEFT=( "${tmpArrAAA[@]}" )
 
